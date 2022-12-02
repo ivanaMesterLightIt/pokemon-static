@@ -2,21 +2,24 @@ import { NextPage } from "next";
 import { Layout } from "../components/layouts";
 import { GetStaticProps } from "next";
 import { pokeApi } from "../api";
-import { PokemonListResponse } from "../interfaces";
+import { PokemonListResponse, SmallPokemon } from "../interfaces";
 
-const HomePage: NextPage = (props)  => {
+interface Props {
+  pokemons: SmallPokemon[];
+}
 
-  console.log({props});
+const HomePage: NextPage<Props> = ({ pokemons })  => {
 
   return (
     <Layout title="Listado de pokemons">
       <ul>
-        <li>Pokemon</li>
-        <li>Pokemon</li>
-        <li>Pokemon</li>
-        <li>Pokemon</li>
-        <li>Pokemon</li>
-        <li>Pokemon</li>
+        {
+          pokemons.map(({id, name}) => (
+            <li key={id}>
+              #{id} - {name}
+            </li>
+          ))
+        }
       </ul>
     </Layout>
   )
@@ -31,9 +34,15 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
   });
   console.log(data);
 
+  const pokemons: SmallPokemon[] = data.results.map((poke, i) => ({
+    ...poke,
+    id: i + 1,
+    img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${ i + 1}.svg`
+  }))
+
   return {
     props: {
-      pokemons: data.results
+      pokemons
     }
   }
 }
